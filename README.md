@@ -6,18 +6,23 @@ Right now, this code uses the output of Colmap to get camera's poses and camera'
 
 1. Build thirdparty libs : 
 
+```bash
 $ chmod +x build_thridpary.sh
-= ./build_thirdparty.sh
+$ ./build_thirdparty.sh
+```
 
 2. Build the code :
 
+```bash
 $ mkdir build 
 $ cd build
 $ cmake ..
 $ make -j4
+```
 
 3. Run :
 
+```bash
 $ cd build
 $ ./ply_mesh_to_depth_maps path1/to/colmap_mesh.ply path2/to/colmap_sparse_results/ output/path/for/depth_maps/
-
+```
