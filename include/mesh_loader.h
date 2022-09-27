@@ -8,7 +8,7 @@
 #include "utils.h"
 
 // Mesh loader
-void readPlyFile(const std::string &mesh_path, std::vector<float3> &vverts, std::vector<uint3> &vfaces)
+void readPlyFile(const std::string &mesh_path, std::vector<float3> &vverts, std::vector<uint3> &vfaces, std::vector<float3> &vnormals)
 {
     std::cout << "........................................................................\n";
     std::cout << "Reading PLY file: " << mesh_path << std::endl;
@@ -46,7 +46,7 @@ void readPlyFile(const std::string &mesh_path, std::vector<float3> &vverts, std:
             }
         }
 
-        std::shared_ptr<tinyply::PlyData> pvertices, pfaces;
+        std::shared_ptr<tinyply::PlyData> pvertices, pfaces, pnormals;
 
         // The header information can be used to programmatically extract properties on elements
         // known to exist in the header prior to reading the data. For brevity of this sample, properties 
@@ -57,12 +57,14 @@ void readPlyFile(const std::string &mesh_path, std::vector<float3> &vverts, std:
         try { pfaces = file.request_properties_from_element("face", { "vertex_indices" }, 3); }
         catch (const std::exception & e) { std::cerr << "tinyply exception: " << e.what() << std::endl; }
 
+        try { pnormals = file.request_properties_from_element("vertex", { "nx", "ny", "nz" }); }
+        catch (const std::exception & e) { std::cerr << "tinyply exception: " << e.what() << std::endl; }
 
         file.read(*file_stream);
 
         if (pvertices)   std::cout << "\tRead " << pvertices->count  << " total vertices "<< std::endl;
+        if (pnormals) std::cout << "\tRead " << pnormals->count  << " total normals "<< std::endl;
         if (pfaces)   std::cout << "\tRead " << pfaces->count  << " total faces "<< std::endl;
-
 
         const size_t numVerticesBytes = pvertices->buffer.size_bytes();
         vverts.resize(pvertices->count);
@@ -71,9 +73,25 @@ void readPlyFile(const std::string &mesh_path, std::vector<float3> &vverts, std:
         const size_t numFacesBytes = pfaces->buffer.size_bytes();
         vfaces.resize(pfaces->count);
         std::memcpy(vfaces.data(), pfaces->buffer.get(), numFacesBytes);
-
+        
         std::cout << "\n > Number of vertices : " << vverts.size() << std::endl;
         std::cout << "\n > Number of faces : " << vfaces.size() << std::endl;
+
+        if (pnormals)
+        {
+            if (pvertices->count != pnormals->count)
+            {
+                std::cerr << "\tSHOULD HAVE AS MANY NORMALS AS VERTICES!!!\n";
+                std::cerr << "\tCHECK YOUR PLY FILE...\n";
+                exit(-1);
+            }
+
+            const size_t numNormalsBytes = pnormals->buffer.size_bytes();
+            vnormals.resize(pnormals->count);
+            std::memcpy(vnormals.data(), pnormals->buffer.get(), numNormalsBytes);
+
+            std::cout << "\n > Number of normals : " << vnormals.size() << std::endl;
+        }
 
         timer.stop();
         std::cout << "\n >>> PLY file " << mesh_path << " read in " << timer.get() << "ms!\n";

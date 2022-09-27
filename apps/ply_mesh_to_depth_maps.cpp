@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
   if (argc < 4)
   {
-    std::cerr << "Usage : ./ply_mesh_to_depth_maps mesh_path colmap_result_path out_depth_maps_path" << std::endl;
+    std::cerr << "Usage : ./ply_mesh_to_depth_maps mesh_path colmap_result_path out_depth_maps_path filter_depth_on_normals(default = true)" << std::endl;
     return -1;
   }
 
@@ -17,6 +17,12 @@ int main(int argc, char *argv[])
   std::string mesh_path = argv[1];
   std::string colmap_result_path = argv[2];
   std::string out_depth_maps_path = argv[3];
+
+  bool filter_depth_on_normals = true;
+  if (argc > 4)
+  {
+    filter_depth_on_normals = std::stoi(argv[4]);
+  }
 
   // 2. Load Camera's Calib (Expecting Undistorted Calib) and Images' SE(3) Poses
   // ============================================================================
@@ -39,7 +45,8 @@ int main(int argc, char *argv[])
                       colmap_reader.m_map_img_names_T_world_cam, 
                       image_rays.m_vbvs, 
                       image_rays.m_img_cols, 
-                      image_rays.m_img_rows);
+                      image_rays.m_img_rows,
+                      filter_depth_on_normals);
 
   return 0;
 }

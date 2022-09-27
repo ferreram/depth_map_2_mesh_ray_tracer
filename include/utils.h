@@ -6,6 +6,8 @@
 
 typedef std::vector<Sophus::SE3d, Eigen::aligned_allocator<Sophus::SE3d> > VectorAlignSE3d;
 typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > VectorAlignV3d;
+typedef std::vector<Sophus::SE3f, Eigen::aligned_allocator<Sophus::SE3f> > VectorAlignSE3f;
+typedef std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > VectorAlignV3f;
 
 struct float3 { float x, y, z; };
 struct float6 { float u1, v1, u2, v2, u3, v3; };

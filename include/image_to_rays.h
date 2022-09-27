@@ -14,28 +14,28 @@ struct ImageRays
     const size_t nb_px = m_img_cols * m_img_rows;
     m_vbvs.resize(nb_px);
 
-    const double inv_fx = 1. / m_fx;
-    const double inv_fy = 1. / m_fy;
+    const float inv_fx = 1.f / m_fx;
+    const float inv_fy = 1.f / m_fy;
 
     #pragma omp parallel for
-    for (int r = 0 ; r < m_img_rows ; r++)
+    for (int r = 0 ; r < m_img_rows ; ++r)
     {
-      for (int c = 0 ; c < m_img_cols ; c++)
+      for (int c = 0 ; c < m_img_cols ; ++c)
       {
-        const double u = static_cast<double>(c) + 0.5;
-        const double v = static_cast<double>(r) + 0.5;
+        const float u = static_cast<float>(c) + 0.5f;
+        const float v = static_cast<float>(r) + 0.5f;
 
-        const double x = (u - m_cx) * inv_fx;
-        const double y = (v - m_cy) * inv_fy;
+        const float x = (u - m_cx) * inv_fx;
+        const float y = (v - m_cy) * inv_fy;
 
-        const Eigen::Vector3d bv(x, y, 1.);
+        const Eigen::Vector3f bv(x, y, 1.f);
 
         m_vbvs.at(r * m_img_cols + c) = bv.normalized();
       }
     }
   }
 
-  double m_fx, m_fy, m_cx, m_cy;
+  float m_fx, m_fy, m_cx, m_cy;
   int m_img_cols, m_img_rows;
-  VectorAlignV3d m_vbvs;
+  VectorAlignV3f m_vbvs;
 };
