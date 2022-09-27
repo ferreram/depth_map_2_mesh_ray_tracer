@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ply_mesh_to_depth_maps)
+project(mesh_ray_caster)
 
 if( ${CMAKE_VERSION} VERSION_LESS "3.8.2" )
     set(CMAKE_CXX_STANDARD 14)
@@ -61,28 +61,48 @@ endif (OpenCV_FOUND)
 ## Build ##
 ###########
 
-add_executable(${PROJECT_NAME} apps/ply_mesh_to_depth_maps.cpp
-              source/colmap_reader.cpp)
+add_executable(ply_mesh_to_depth_maps apps/ply_mesh_to_depth_maps.cpp
+                                              source/colmap_reader.cpp)
 
-target_include_directories(${PROJECT_NAME}
-  # PUBLIC
+target_include_directories(ply_mesh_to_depth_maps
   PRIVATE
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/source
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/thirdparty/rayint_libs
     ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
-  # PRIVATE
     ${Boost_INCLUDE_DIRS}
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(ply_mesh_to_depth_maps
   PRIVATE
     ${OpenCV_LIBS}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_PROGRAM_OPTIONS_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
-  # INTERFACE
+    Eigen3::Eigen
+    Sophus::Sophus
+)
+
+add_executable(render_images_from_mesh apps/render_images_from_mesh.cpp
+                                            source/colmap_reader.cpp)
+
+target_include_directories(render_images_from_mesh
+  PRIVATE
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/source
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/thirdparty/rayint_libs
+    ${PROJECT_SOURCE_DIR}/thirdparty/Sophus
+    ${Boost_INCLUDE_DIRS}
+)
+
+target_link_libraries(render_images_from_mesh
+  PRIVATE
+    ${OpenCV_LIBS}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_PROGRAM_OPTIONS_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
     Eigen3::Eigen
     Sophus::Sophus
 )
